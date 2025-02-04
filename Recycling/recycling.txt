@@ -1,0 +1,3 @@
+Current version accepts shapes from bottom and creates an output from its colors and layers.
+
+Later version may need color-remover-liquid to do that... working on this
