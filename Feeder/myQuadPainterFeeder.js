@@ -2,15 +2,14 @@
 const METADATA = {
     website: "steam / xboxplayer9889",
     author: "xboxplayer9889",
-    name: "4x1colorfeeder",
-    version: "0",
+    name: "ColorFeeder for QuadPainter",
+    version: "0.5",
     id: "add-colorfeeder",
     description: "These building mix colors and feeds quadpainter",
     minimumGameVersion: ">=1.5.0",
 };
 
 shapez.iptColorFeeder = {};
-shapez.iptColorFeeder.outslot = 0;
 shapez.iptColorFeeder.reqout = [ null,null,null,null ];
 shapez.iptColorFeeder.out = [ null,null,null,null ];
 shapez.enumItemProcessorTypes.iptColorFeeder = "iptColorFeeder";
@@ -19,22 +18,22 @@ shapez.MOD_ITEM_PROCESSOR_HANDLERS.iptColorFeeder = function (payload) {
     const wpins = payload.entity.components.WiredPins;
     for (var i=0;i<4;i++) {
         if (wpins.slots[i].linkedNetwork)
-          if (wpins.slots[i].linkedNetwork.currentValue)
-            if (wpins.slots[i].linkedNetwork.currentValue._type=='color') {
-                shapez.iptColorFeeder.reqout[i] = wpins.slots[i].linkedNetwork.currentValue.color;
-            }
+            if (wpins.slots[i].linkedNetwork.currentValue)
+                if (wpins.slots[i].linkedNetwork.currentValue._type=='color') {
+                    var c = wpins.slots[i].linkedNetwork.currentValue.color;
+                    shapez.iptColorFeeder.reqout[i] = ( c=='uncolored' ? null : c );
+                }
+                else
+                    shapez.iptColorFeeder.reqout[i] = null;
+            else
+                shapez.iptColorFeeder.reqout[i] = null;
+        else
+            shapez.iptColorFeeder.reqout[i] = null;
     }
     for (var i=0;i<3;i++) {
         const curitem = payload.items.get(i);
         if (curitem!=null) {
             if (curitem._type == "color") {
-/*                shapez.iptColorFeeder.outslot += 1;
-                shapez.iptColorFeeder.outslot %= 4;
-                payload.outItems.push({
-                    item: curitem,
-                    requiredSlot: shapez.iptColorFeeder.outslot,
-                });
-*/
                 var j = 0;
                 while (j<4) {
                     if ( (curitem.color === shapez.iptColorFeeder.reqout[j]) & (shapez.iptColorFeeder.out[j]===null) ) {
@@ -50,14 +49,16 @@ shapez.MOD_ITEM_PROCESSOR_HANDLERS.iptColorFeeder = function (payload) {
 
                 var len = 0;
                 for (var k=0;k<4;k++) {
-                    len += (shapez.iptColorFeeder.out[k]!=null ? 1 : 0);
+                    len += (shapez.iptColorFeeder.out[k]!=null | shapez.iptColorFeeder.reqout[k]===null ? 1 : 0);
                 }
                 if (len==4) {
                     for (var k=0;k<4;k++) {
-                        payload.outItems.push({
-                            item: shapez.iptColorFeeder.out[k],
-                            requiredSlot: k,
-                        });
+                        if (shapez.iptColorFeeder.out[k]!=null) {
+                            payload.outItems.push({
+                                item: shapez.iptColorFeeder.out[k],
+                                requiredSlot: k,
+                            });
+                        }
                     }
                     shapez.iptColorFeeder.out = [ null,null,null,null ];
                 }
@@ -71,10 +72,9 @@ shapez.MOD_ITEM_PROCESSOR_HANDLERS.iptColorFeeder = function (payload) {
         }
     }
     const truevalue = new shapez.BooleanItem(1);
-    wpins.slots[4].value = truevalue;
-    wpins.slots[5].value = truevalue;
-    wpins.slots[6].value = truevalue;
-    wpins.slots[7].value = truevalue;
+    const falsevalue = new shapez.BooleanItem(0);
+    for (var k=0;k<4;k++)
+        wpins.slots[4+k].value = ( shapez.iptColorFeeder.reqout[k]!=null ? truevalue : falsevalue );
 }
 
 
@@ -87,8 +87,8 @@ class myColorFeeder extends shapez.ModMetaBuilding {
         return [
             {
                 variant: shapez.defaultBuildingVariant,
-                name: "ColorMixer + Feeder for QuadPainter",
-                description: "Feeder",
+                name: "ColorFeeder for quadPainter",
+                description: "Designed to feed quadPainter with colors, but you can use as a color splitter",
 
                 regularImageBase64: RESOURCES["myColorFeeder.png"],
                 blueprintImageBase64: RESOURCES["myColorFeeder.png"],
@@ -105,6 +105,11 @@ class myColorFeeder extends shapez.ModMetaBuilding {
 
     getSilhouetteColor() {
         return "yellow";
+    }
+
+    getAdditionalStatistics(root) {
+        const speed = root.hubGoals.getProcessorBaseSpeed(shapez.enumItemProcessorTypes.iptColorFeeder);
+        return [[shapez.T.ingame.buildingPlacement.infoTexts.speed, shapez.formatItemsPerSecond(speed)]];
     }
 
     getIsUnlocked(root) {
@@ -187,6 +192,7 @@ class myColorFeeder extends shapez.ModMetaBuilding {
                         { pos: new shapez.Vector(1, 0), direction: shapez.enumDirection.bottom, },
                         { pos: new shapez.Vector(2, 0), direction: shapez.enumDirection.bottom, },
                         { pos: new shapez.Vector(3, 0), direction: shapez.enumDirection.bottom, },
+//                        { pos: new shapez.Vector(0, 0), direction: shapez.enumDirection.left, filter: "liquid" },
                 ]);
                 entity.components.ItemEjector.setSlots([
                     { pos: new shapez.Vector(0, 0), direction: shapez.enumDirection.top},
@@ -198,7 +204,7 @@ class myColorFeeder extends shapez.ModMetaBuilding {
                 break;
             }
             default:
-                assertAlways(false, "Unknown myColorRemover variant: " + variant);
+                assertAlways(false, "Unknown myColorFeeder variant: " + variant);
         }
     }
 }
