@@ -16,6 +16,7 @@ shapez.iptColorFeeder.out = [ null,null,null,null ];
 shapez.enumItemProcessorTypes.iptColorFeeder = "iptColorFeeder";
 shapez.MOD_ITEM_PROCESSOR_SPEEDS.iptColorFeeder = () => 10;
 shapez.MOD_ITEM_PROCESSOR_HANDLERS.iptColorFeeder = function (payload) {
+    const wpins = payload.entity.components.WiredPins;
     for (var i=0;i<3;i++) {
         const curitem = payload.items.get(i);
         if (curitem!=null) {
@@ -62,6 +63,11 @@ shapez.MOD_ITEM_PROCESSOR_HANDLERS.iptColorFeeder = function (payload) {
             }
         }
     }
+    const truevalue = new shapez.BooleanItem(1);
+    wpins.slots[4].value = truevalue;
+    wpins.slots[5].value = truevalue;
+    wpins.slots[6].value = truevalue;
+    wpins.slots[7].value = truevalue;
 }
 
 
@@ -127,22 +133,22 @@ class myColorFeeder extends shapez.ModMetaBuilding {
                     {
                         pos: new shapez.Vector(0, 0),
                         direction: shapez.enumDirection.top,
-                        type: shapez.enumPinSlotType.logicalAcceptor,
+                        type: shapez.enumPinSlotType.logicalEjector,
                     },
                     {
                         pos: new shapez.Vector(1, 0),
                         direction: shapez.enumDirection.top,
-                        type: shapez.enumPinSlotType.logicalAcceptor,
+                        type: shapez.enumPinSlotType.logicalEjector,
                     },
                     {
                         pos: new shapez.Vector(2, 0),
                         direction: shapez.enumDirection.top,
-                        type: shapez.enumPinSlotType.logicalAcceptor,
+                        type: shapez.enumPinSlotType.logicalEjector,
                     },
                     {
                         pos: new shapez.Vector(3, 0),
                         direction: shapez.enumDirection.top,
-                        type: shapez.enumPinSlotType.logicalAcceptor,
+                        type: shapez.enumPinSlotType.logicalEjector,
                     },
                 ],
             })
