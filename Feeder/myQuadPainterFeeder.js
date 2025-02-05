@@ -192,7 +192,6 @@ class myColorFeeder extends shapez.ModMetaBuilding {
                         { pos: new shapez.Vector(1, 0), direction: shapez.enumDirection.bottom, },
                         { pos: new shapez.Vector(2, 0), direction: shapez.enumDirection.bottom, },
                         { pos: new shapez.Vector(3, 0), direction: shapez.enumDirection.bottom, },
-//                        { pos: new shapez.Vector(0, 0), direction: shapez.enumDirection.left, filter: "liquid" },
                 ]);
                 entity.components.ItemEjector.setSlots([
                     { pos: new shapez.Vector(0, 0), direction: shapez.enumDirection.top},
