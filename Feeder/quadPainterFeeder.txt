@@ -1,0 +1,10 @@
+This building will feed the quadPainter with colors.
+
+
+The plan:
+- 3 lines in at regular layer (R,G,B)
+- 4 lines out at regular layer (mixed colors as needed, simple connect to quadPainter) 
+- + "trash" out
+
+- 4 lines in at wire layer (the sign of colors you need)
+- 4 lines out at wire layer (connect to quadPainter slots to enable painting if needed)
