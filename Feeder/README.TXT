@@ -3,7 +3,7 @@ Feeder for quadPainter
 
 This building (mod) designed to feed quadPainter with colors, but you can use it as a color splitter.
 
-https://github.com/xboxplayer9889/mymods-for-shapezio/blob/main/images/myQuadPainterFeeder.jpg
+<img src="https://github.com/xboxplayer9889/mymods-for-shapezio/blob/main/images/myQuadPainterFeeder.jpg">
 
 
 Current version: v0.5
