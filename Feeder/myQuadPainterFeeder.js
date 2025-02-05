@@ -11,12 +11,19 @@ const METADATA = {
 
 shapez.iptColorFeeder = {};
 shapez.iptColorFeeder.outslot = 0;
-shapez.iptColorFeeder.reqout = [ 'red','green','blue','blue' ];
+shapez.iptColorFeeder.reqout = [ null,null,null,null ];
 shapez.iptColorFeeder.out = [ null,null,null,null ];
 shapez.enumItemProcessorTypes.iptColorFeeder = "iptColorFeeder";
 shapez.MOD_ITEM_PROCESSOR_SPEEDS.iptColorFeeder = () => 10;
 shapez.MOD_ITEM_PROCESSOR_HANDLERS.iptColorFeeder = function (payload) {
     const wpins = payload.entity.components.WiredPins;
+    for (var i=0;i<4;i++) {
+        if (wpins.slots[i].linkedNetwork)
+          if (wpins.slots[i].linkedNetwork.currentValue)
+            if (wpins.slots[i].linkedNetwork.currentValue._type=='color') {
+                shapez.iptColorFeeder.reqout[i] = wpins.slots[i].linkedNetwork.currentValue.color;
+            }
+    }
     for (var i=0;i<3;i++) {
         const curitem = payload.items.get(i);
         if (curitem!=null) {
