@@ -16,4 +16,4 @@ Current version: v0.5
    - 4 input at bottom, the color sign, this color will be sent out on that line, nothing if not color or no sign
    - 4 output at top, connect directly to quadPainter, it will controll the painter
 
-   
+if u'd like to send out yellow/cyan/magenta/white u have to connect them to one of the input lines too.   
