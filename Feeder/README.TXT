@@ -11,7 +11,7 @@ Current version: v0.6
    - there are 3 input lines at bottom (RGB) but u can connect anything to it and 1 line is enough to work well
    - 1 trash line at right, here it drops out unwanted,unneccessary items, if u don't need them add a trashbin to here
    - 4 output line available, managed by wire layer or with the switch
-   - it waits!!! until all the output arrives and send out just then together
+   - it waits!!! until all the outputs arrives and send out just then together
 
    wirelayer:
    - 4 input at bottom, the color sign, this color will be sent out on that line, nothing if not color or no sign
