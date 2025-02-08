@@ -21,5 +21,7 @@ Current version: v0.6
    - put down 4 from switch next to each other and put a Feeder on top of them (don't leave spaces)
    - click on switches to select the colors u'd like
    - don't forget to connect at least 1 line with the selected colors to RGB of Feeder through swithes
+   
+   https://github.com/xboxplayer9889/mymods-for-shapezio/blob/main/images/mySwitch.jpg
 
 if u'd like to send out yellow/cyan/magenta/white u have to connect them to one of the input lines too.   
