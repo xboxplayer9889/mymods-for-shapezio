@@ -129,9 +129,16 @@ class myColorFeeder extends shapez.ModMetaBuilding {
     }
 
     getIsUnlocked(root) {
+        this.updateSpeed(root);
         // unuseable before level 20 without mySwitch
         // return (root.hubGoals.isRewardUnlocked(shapez.enumHubGoalRewards.reward_painter_double));
         return true;
+    }
+
+    // on level 45 it is too slow, increase to balancer's speed
+    updateSpeed(root) {
+        var balancerspeed = root.hubGoals.getProcessorBaseSpeed(shapez.enumItemProcessorTypes.balancer);
+        if (balancerspeed>shapez.MOD_ITEM_PROCESSOR_SPEEDS.iptColorFeeder()) shapez.MOD_ITEM_PROCESSOR_SPEEDS.iptColorFeeder = () => balancerspeed;
     }
 
     setupEntityComponents(entity) {
