@@ -20,6 +20,10 @@ shapez.enumItemProcessorTypes.iptColorFeeder = "iptColorFeeder";
 shapez.MOD_ITEM_PROCESSOR_SPEEDS.iptColorFeeder = () => 10;
 
 shapez.MOD_ITEM_PROCESSOR_HANDLERS.iptColorFeeder = function (payload) {
+    // on level 45 it is too slow, increasing to balancer's speed
+    var balancerspeed = this.root.hubGoals.getProcessorBaseSpeed(shapez.enumItemProcessorTypes.balancer);
+    if (balancerspeed>shapez.MOD_ITEM_PROCESSOR_SPEEDS.iptColorFeeder()) shapez.MOD_ITEM_PROCESSOR_SPEEDS.iptColorFeeder = () => balancerspeed;
+    
     const wpins = payload.entity.components.WiredPins;
     const uid = payload.entity.uid;
     if ( !shapez.iptColorFeeder.reqout[uid] ) shapez.iptColorFeeder.reqout[uid] = [ null,null,null,null ];
