@@ -26,3 +26,7 @@ Current version: v0.6
    <img src="https://github.com/xboxplayer9889/mymods-for-shapezio/blob/main/images/mySwitch.jpg">
 
 if u'd like to send out yellow/cyan/magenta/white u have to connect them to one of the input lines too.   
+
+AND NOW... with 3D design icons:
+
+<img src="https://github.com/xboxplayer9889/mymods-for-shapezio/blob/main/images/mycolorfeeder2.gif">
