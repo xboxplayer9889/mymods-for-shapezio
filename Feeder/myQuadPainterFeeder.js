@@ -3,7 +3,7 @@ const METADATA = {
     website: "steam / xboxplayer9889",
     author: "xboxplayer9889",
     name: "ColorFeeder for QuadPainter",
-    version: "0.6",
+    version: "0.7",
     id: "add-colorfeeder",
     description: "These building mix colors and feeds quadpainter",
     minimumGameVersion: ">=1.5.0",
@@ -430,7 +430,6 @@ class myColorMixOutComponent extends myColorOutComponent {
                     if ( this.mixelementof[color].includes(this.mixslot[slotindex].required) ) {
                         this.mixslot[slotindex].collected.push(color);
                         if ( (this.mixslot[slotindex].collected.length==2 & this.mixslot[slotindex].required!='white') | (this.mixslot[slotindex].collected.length==3 & this.mixslot[slotindex].required=='white') ) {
-                            console.log(this.mixslot[slotindex].required,this.mixslot[slotindex].collected);
                             this.mixslot[slotindex].required = null;
                             this.mixslot[slotindex].collected = [];
                             this.outslot[slotindex] = new shapez.ColorItem( this.reqout[slotindex] );
