@@ -250,7 +250,6 @@ class myColorFeeder extends shapez.ModMetaBuilding {
 }
 
 // Mixing version of Feeder
-// currently absolute the same as parent
 class myColorMixFeeder extends myColorFeeder {
     constructor() {
         super("myColorMixFeeder");
@@ -344,7 +343,6 @@ class myColorOutComponent extends shapez.Component {
         while (j<this.outputLines) {
             if ( (curitem.color === this.reqout[j]) & (this.outslot[j]===null) ) {
                 this.outslot[j]=curitem;
-                //j=this.outputLines+2;
                 return true;
             }
             j++;
@@ -361,7 +359,6 @@ class myColorOutComponent extends shapez.Component {
         return (len==this.outputLines);
     }
 
-
     constructor({ inputlines = 0, outputlines = 0 }) {
         super();
         this.inputLines = inputlines;
@@ -375,12 +372,82 @@ class myColorOutComponent extends shapez.Component {
     }
 }
 
+// the OutComponent for Mixing from RGB
 class myColorMixOutComponent extends myColorOutComponent {
     static getId() {
         return "myColorMixOutComponent";
     }
+
     constructor({ inputlines = 0, outputlines = 0 }) {
         super( {inputlines,outputlines} );
+        this.mixslot = [];
+        for (var i=0; i<outputlines; i++) {
+            this.mixslot[i] = { required:null,collected:[] };
+        }
+        this.mixelementof = {
+            'red'   : ['yellow','purple','white'],
+            'green' : ['yellow','cyan','white'],
+            'blue'  : ['purple','cyan','white'],
+        }
+        this.mixable = ['yellow', 'purple', 'cyan', 'white'];
+    }
+
+    setupRequiredOutput( wpins ) {
+        super.setupRequiredOutput( wpins );
+        for (var i=0;i<this.outputLines;i++) {
+            if (this.reqout[i]!=this.mixslot[i].required) {
+                this.mixslot[i].required = null;
+                this.mixslot[i].collected = [];
+            }
+        }
+    }
+
+    isMixable( color ) {
+        return this.mixable.includes(color);
+    }
+
+    tryToHandleInput( curitem ) {
+        if ( !super.tryToHandleInput( curitem ) ) {
+            var j = 0;
+            while (j<this.outputLines) {
+                if ( this.isMixable(this.reqout[j]) & this.outslot[j]===null ) {
+                    if ( this.tryToMix(j,curitem.color) ) return true
+                }
+                j++;
+            }
+            return false;
+        }
+        else
+            return true;
+    }
+
+    tryToMix( slotindex, color ) {
+        if (this.reqout[slotindex]==this.mixslot[slotindex].required) {
+            if ( this.mixslot[slotindex].collected.includes(color) )
+                return false;
+            else {
+                if (!this.isMixable(color))
+                    if ( this.mixelementof[color].includes(this.mixslot[slotindex].required) ) {
+                        this.mixslot[slotindex].collected.push(color);
+                        if ( (this.mixslot[slotindex].collected.length==2 & this.mixslot[slotindex].required!='white') | (this.mixslot[slotindex].collected.length==3 & this.mixslot[slotindex].required=='white') ) {
+                            console.log(this.mixslot[slotindex].required,this.mixslot[slotindex].collected);
+                            this.mixslot[slotindex].required = null;
+                            this.mixslot[slotindex].collected = [];
+                            this.outslot[slotindex] = new shapez.ColorItem( this.reqout[slotindex] );
+                            return true;
+                        }
+                    }
+            }
+        }
+        else {
+            if (!this.isMixable(color))
+                if ( this.mixelementof[color].includes(this.reqout[slotindex]) ) {
+                    this.mixslot[slotindex].required = this.reqout[slotindex];
+                    this.mixslot[slotindex].collected.push(color);
+                    return true;
+                }
+        }
+        return false;
     }
 }
 
