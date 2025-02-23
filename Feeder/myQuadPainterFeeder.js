@@ -9,84 +9,99 @@ const METADATA = {
     minimumGameVersion: ">=1.5.0",
 };
 
-// i may create a compnent instead, but out[uid] works i think
-shapez.iptColorFeeder = {};
-shapez.iptColorFeeder.reqout = [];
-shapez.iptColorFeeder.out = [];
-shapez.iptColorFeeder.inputlines = 3;
-shapez.iptColorFeeder.outputlines = 4;
-
 shapez.enumItemProcessorTypes.iptColorFeeder = "iptColorFeeder";
+shapez.enumItemProcessorTypes.iptColorMixFeeder = "iptColorMixFeeder";
 shapez.MOD_ITEM_PROCESSOR_SPEEDS.iptColorFeeder = () => 10;
+shapez.MOD_ITEM_PROCESSOR_SPEEDS.iptColorMixFeeder = () => 10;
 
 shapez.MOD_ITEM_PROCESSOR_HANDLERS.iptColorFeeder = function (payload) {
-    // on level 45 it is too slow, increasing to balancer's speed
+    // on level 45 it is too slow, increase to balancer's speed
     var balancerspeed = this.root.hubGoals.getProcessorBaseSpeed(shapez.enumItemProcessorTypes.balancer);
     if (balancerspeed>shapez.MOD_ITEM_PROCESSOR_SPEEDS.iptColorFeeder()) shapez.MOD_ITEM_PROCESSOR_SPEEDS.iptColorFeeder = () => balancerspeed;
-    
-    const wpins = payload.entity.components.WiredPins;
-    const uid = payload.entity.uid;
-    if ( !shapez.iptColorFeeder.reqout[uid] ) shapez.iptColorFeeder.reqout[uid] = [ null,null,null,null ];
-    if ( !shapez.iptColorFeeder.out[uid] ) shapez.iptColorFeeder.out[uid] = [ null,null,null,null ];
 
-    // setup required color data array from wire inputlines
-    for (var i=0;i<shapez.iptColorFeeder.outputlines;i++) {
-        if (wpins.slots[i].linkedNetwork)
-            if (wpins.slots[i].linkedNetwork.currentValue)
-                if (wpins.slots[i].linkedNetwork.currentValue._type=='color') {
-                    var c = wpins.slots[i].linkedNetwork.currentValue.color;
-                    shapez.iptColorFeeder.reqout[uid][i] = ( c=='uncolored' ? null : c );
-                }
-                else
-                    shapez.iptColorFeeder.reqout[uid][i] = null;
-            else
-                shapez.iptColorFeeder.reqout[uid][i] = null;
-        else
-            shapez.iptColorFeeder.reqout[uid][i] = null;
-    }
+    const myColorOutComp = payload.entity.components.myColorOutComponent;
+    const wpins = payload.entity.components.WiredPins;
+
+    if (myColorOutComp!=null & wpins!=null) myColorOutComp.setupRequiredOutput(wpins);
+
     // setup painter connection wire outputlines
-    for (var k=0;k<shapez.iptColorFeeder.outputlines;k++)
-        wpins.slots[shapez.iptColorFeeder.outputlines+k].value = ( shapez.iptColorFeeder.reqout[uid][k]!=null ? shapez.BOOL_TRUE_SINGLETON : shapez.BOOL_FALSE_SINGLETON );
+    for (var k=0;k<myColorOutComp.outputLines;k++)
+        wpins.slots[myColorOutComp.outputLines+k].value = ( myColorOutComp.reqout[k]!=null ? shapez.BOOL_TRUE_SINGLETON : shapez.BOOL_FALSE_SINGLETON );
 
     // handle input arrived event
-    for (var i=0;i<shapez.iptColorFeeder.inputlines;i++) {
+    for (var i=0;i<myColorOutComp.inputLines;i++) {
         const curitem = payload.items.get(i);
         if (curitem!=null) {
             if (curitem._type == "color") {
-                var j = 0;
-                while (j<shapez.iptColorFeeder.outputlines) {
-                    if ( (curitem.color === shapez.iptColorFeeder.reqout[uid][j]) & (shapez.iptColorFeeder.out[uid][j]===null) ) {
-                        shapez.iptColorFeeder.out[uid][j]=curitem;
-                        j=shapez.iptColorFeeder.outputlines+2;
-                    }
-                    j++;
-                }
-                if (j<shapez.iptColorFeeder.outputlines+1) payload.outItems.push({
-                            item: curitem,
-                            requiredSlot: shapez.iptColorFeeder.outputlines,
-                        });
-
-                // check if all output ready and send them out if
-                var len = 0;
-                for (var k=0;k<shapez.iptColorFeeder.outputlines;k++) {
-                    len += (shapez.iptColorFeeder.out[uid][k]!=null | shapez.iptColorFeeder.reqout[uid][k]===null ? 1 : 0);
-                }
-                if (len==shapez.iptColorFeeder.outputlines) {
-                    for (var k=0;k<shapez.iptColorFeeder.outputlines;k++) {
-                        if (shapez.iptColorFeeder.out[uid][k]!=null) {
+                if (myColorOutComp.tryToHandleInput( curitem )===false)
+                    payload.outItems.push({
+                        item: curitem,
+                        requiredSlot: myColorOutComp.outputLines,
+                    });
+                else
+                  if (myColorOutComp.checkIfOutputReady()) {
+                    for (var k=0;k<myColorOutComp.outputLines;k++) {
+                        if (myColorOutComp.outslot[k]!=null) {
                             payload.outItems.push({
-                                item: shapez.iptColorFeeder.out[uid][k],
+                                item: myColorOutComp.outslot[k],
                                 requiredSlot: k,
                             });
                         }
                     }
-                    shapez.iptColorFeeder.out[uid] = [ null,null,null,null ];
+                    myColorOutComp.outslot = [ null,null,null,null ];
                 }
             }
             else {
                 payload.outItems.push({
                     item: curitem,
-                    requiredSlot: shapez.iptColorFeeder.outputlines,
+                    requiredSlot: myColorOutComp.outputLines,
+                });
+            }
+        }
+    }
+}
+
+shapez.MOD_ITEM_PROCESSOR_HANDLERS.iptColorMixFeeder = function (payload) {
+    // on level 45 it is too slow, increase to balancer's speed
+    var balancerspeed = this.root.hubGoals.getProcessorBaseSpeed(shapez.enumItemProcessorTypes.balancer);
+    if (balancerspeed>shapez.MOD_ITEM_PROCESSOR_SPEEDS.iptColorMixFeeder()) shapez.MOD_ITEM_PROCESSOR_SPEEDS.iptColorMixFeeder = () => balancerspeed;
+
+    const myColorMixOutComp = payload.entity.components.myColorMixOutComponent;
+    const wpins = payload.entity.components.WiredPins;
+
+    if (myColorMixOutComp!=null & wpins!=null) myColorMixOutComp.setupRequiredOutput(wpins);
+
+    // setup painter connection wire outputlines
+    for (var k=0;k<myColorMixOutComp.outputLines;k++)
+        wpins.slots[myColorMixOutComp.outputLines+k].value = ( myColorMixOutComp.reqout[k]!=null ? shapez.BOOL_TRUE_SINGLETON : shapez.BOOL_FALSE_SINGLETON );
+
+    // handle input arrived event
+    for (var i=0;i<myColorMixOutComp.inputLines;i++) {
+        const curitem = payload.items.get(i);
+        if (curitem!=null) {
+            if (curitem._type == "color") {
+                if (myColorMixOutComp.tryToHandleInput( curitem )===false)
+                    payload.outItems.push({
+                        item: curitem,
+                        requiredSlot: myColorMixOutComp.outputLines,
+                    });
+                else
+                  if (myColorMixOutComp.checkIfOutputReady()) {
+                    for (var k=0;k<myColorMixOutComp.outputLines;k++) {
+                        if (myColorMixOutComp.outslot[k]!=null) {
+                            payload.outItems.push({
+                                item: myColorMixOutComp.outslot[k],
+                                requiredSlot: k,
+                            });
+                        }
+                    }
+                    myColorMixOutComp.outslot = [ null,null,null,null ];
+                }
+            }
+            else {
+                payload.outItems.push({
+                    item: curitem,
+                    requiredSlot: myColorMixOutComp.outputLines,
                 });
             }
         }
@@ -225,6 +240,7 @@ class myColorFeeder extends shapez.ModMetaBuilding {
                     { pos: new shapez.Vector(3, 0), direction: shapez.enumDirection.top},
                     { pos: new shapez.Vector(3, 0), direction: shapez.enumDirection.right}, // trashout
                 ]);
+                entity.addComponent( new myColorOutComponent({ inputlines:3, outputlines:4 }) );
                 break;
             }
             default:
@@ -264,6 +280,11 @@ class myColorMixFeeder extends myColorFeeder {
         return available;
     }
 
+    updateSpeed(root) {
+        var balancerspeed = root.hubGoals.getProcessorBaseSpeed(shapez.enumItemProcessorTypes.balancer);
+        if (balancerspeed>shapez.MOD_ITEM_PROCESSOR_SPEEDS.iptColorMixFeeder()) shapez.MOD_ITEM_PROCESSOR_SPEEDS.iptColorMixFeeder = () => balancerspeed;
+    }
+
     updateVariants(entity, rotationVariant, variant) {
         switch (variant) {
             case 'myColorMixFeeder':
@@ -276,7 +297,7 @@ class myColorMixFeeder extends myColorFeeder {
                 entity.addComponent(
                     new shapez.ItemProcessorComponent({
                         inputsPerCharge: 1,
-                        processorType: shapez.enumItemProcessorTypes.iptColorFeeder,
+                        processorType: shapez.enumItemProcessorTypes.iptColorMixFeeder,
                     })
                 );
                 entity.components.ItemEjector.setSlots([
@@ -286,11 +307,80 @@ class myColorMixFeeder extends myColorFeeder {
                     { pos: new shapez.Vector(3, 0), direction: shapez.enumDirection.top},
                     { pos: new shapez.Vector(3, 0), direction: shapez.enumDirection.right}, // trashout
                 ]);
+                entity.addComponent( new myColorMixOutComponent({ inputlines:3, outputlines:4 }) );
                 break;
             }
             default:
                 super.updateVariants(entity, rotationVariant, variant);
         }
+    }
+}
+
+class myColorOutComponent extends shapez.Component {
+    static getId() {
+        return "myColorOutComponent";
+    }
+
+    // setup required color data array from wire inputlines
+    setupRequiredOutput( wpins ) {
+        for (var i=0;i<this.outputLines;i++) {
+            if (wpins.slots[i].linkedNetwork)
+                if (wpins.slots[i].linkedNetwork.currentValue)
+                    if (wpins.slots[i].linkedNetwork.currentValue._type=='color') {
+                        var c = wpins.slots[i].linkedNetwork.currentValue.color;
+                        this.reqout[i] = ( c=='uncolored' ? null : c );
+                    }
+                    else
+                        this.reqout[i] = null;
+                else
+                    this.reqout[i] = null;
+            else
+                this.reqout[i] = null;
+        }
+    }
+
+    tryToHandleInput( curitem ) {
+        var j = 0;
+        while (j<this.outputLines) {
+            if ( (curitem.color === this.reqout[j]) & (this.outslot[j]===null) ) {
+                this.outslot[j]=curitem;
+                //j=this.outputLines+2;
+                return true;
+            }
+            j++;
+        }
+        return false;
+    }
+
+    // check if all output ready
+    checkIfOutputReady() {
+        var len = 0;
+        for (var k=0;k<this.outputLines;k++) {
+            len += (this.outslot[k]!=null | this.reqout[k]===null ? 1 : 0);
+        }
+        return (len==this.outputLines);
+    }
+
+
+    constructor({ inputlines = 0, outputlines = 0 }) {
+        super();
+        this.inputLines = inputlines;
+        this.outputLines = outputlines;
+        this.reqout = [];
+        this.outslot = [];
+        for (var i=0; i<outputlines; i++) {
+            this.reqout[i] = null;
+            this.outslot[i] = null;
+        }
+    }
+}
+
+class myColorMixOutComponent extends myColorOutComponent {
+    static getId() {
+        return "myColorMixOutComponent";
+    }
+    constructor({ inputlines = 0, outputlines = 0 }) {
+        super( {inputlines,outputlines} );
     }
 }
 
