@@ -38,8 +38,8 @@ shapez.MOD_ITEM_PROCESSOR_HANDLERS.iptColorFeeder = function (payload) {
                         item: curitem,
                         requiredSlot: myColorOutComp.outputLines,
                     });
-                else
-                  if (myColorOutComp.checkIfOutputReady()) {
+                
+                if (myColorOutComp.checkIfOutputReady()) {
                     for (var k=0;k<myColorOutComp.outputLines;k++) {
                         if (myColorOutComp.outslot[k]!=null) {
                             payload.outItems.push({
@@ -85,8 +85,8 @@ shapez.MOD_ITEM_PROCESSOR_HANDLERS.iptColorMixFeeder = function (payload) {
                         item: curitem,
                         requiredSlot: myColorMixOutComp.outputLines,
                     });
-                else
-                  if (myColorMixOutComp.checkIfOutputReady()) {
+                
+                if (myColorMixOutComp.checkIfOutputReady()) {
                     for (var k=0;k<myColorMixOutComp.outputLines;k++) {
                         if (myColorMixOutComp.outslot[k]!=null) {
                             payload.outItems.push({
