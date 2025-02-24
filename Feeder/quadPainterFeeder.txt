@@ -8,3 +8,14 @@ The plan:
 
 - 4 lines in at wire layer (the sign of colors you need)
 - 4 lines out at wire layer (connect to quadPainter slots to enable painting if needed)
+
+I think I've done this in v0.7.... :-)
+
+-------
+
+Thinking about:
+
+- currently it accepts only color signs at wire layer as a color selection, maybe the colors of the bottom layer should be good as colorselection input
+- mixing version of feeder can mix only from rgb, but white may mixed from y/p/c & its complement color too.
+- have to finalize icons in 2d and in 3d style, then add an option to this module to select which look u'd like to use
+- when chaging colors, some of the conveyor belts connected to output can be full and stops next output with new set of colors until u clear the belt... maybe i could invent a beltcleaner/quadPainter input cleaner.
