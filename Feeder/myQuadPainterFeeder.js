@@ -325,12 +325,20 @@ class myColorOutComponent extends shapez.Component {
         for (var i=0;i<this.outputLines;i++) {
             if (wpins.slots[i].linkedNetwork)
                 if (wpins.slots[i].linkedNetwork.currentValue)
-                    if (wpins.slots[i].linkedNetwork.currentValue._type=='color') {
-                        var c = wpins.slots[i].linkedNetwork.currentValue.color;
-                        this.reqout[i] = ( c=='uncolored' ? null : c );
+                    switch ( wpins.slots[i].linkedNetwork.currentValue._type ) {
+                        case 'color':
+                            var c = wpins.slots[i].linkedNetwork.currentValue.color;
+                            this.reqout[i] = ( c=='uncolored' ? null : c );
+                            break;
+                        case 'shape':
+                            var layers = wpins.slots[i].linkedNetwork.currentValue.definition.layers;
+                            var q = layers[0][i];
+                            this.reqout[i] = ( q!=null ? (q.color=='uncolored' ? null : q.color) : null);
+                            break;
+                        default:
+                            this.reqout[i] = null;
+                            break;
                     }
-                    else
-                        this.reqout[i] = null;
                 else
                     this.reqout[i] = null;
             else
