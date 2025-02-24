@@ -3,7 +3,7 @@ const METADATA = {
     website: "steam / xboxplayer9889",
     author: "xboxplayer9889",
     name: "ColorFeeder for QuadPainter",
-    version: "0.7",
+    version: "0.71",
     id: "add-colorfeeder",
     description: "These building mix colors and feeds quadpainter",
     minimumGameVersion: ">=1.5.0",
