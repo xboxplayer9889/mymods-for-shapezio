@@ -6,7 +6,7 @@ This building (mod) designed to feed quadPainter with colors, but you can use it
 <img src="https://github.com/xboxplayer9889/mymods-for-shapezio/blob/main/images/myQuadPainterFeeder.jpg">
 
 
-Current version: v0.7
+Current version: v0.71
 
    - there are 3 input lines at bottom (RGB) but u can connect anything to it and 1 line is enough to work well
    - 1 trash line at right, here it drops out unwanted,unneccessary items, if u don't need them add a trashbin to here
@@ -31,3 +31,5 @@ if u'd like to send out yellow/cyan/magenta/white u have to connect them to one 
 AND NOW... with 3D design icons:
 
 <img src="https://github.com/xboxplayer9889/mymods-for-shapezio/blob/main/images/mycolorfeeder2.gif">
+and accept color input signs from a shape (from the bottom layer)
+<img src="https://github.com/xboxplayer9889/mymods-for-shapezio/blob/main/images/inputfromshape.jpg">
